@@ -23,7 +23,7 @@ for /f %%V in ('%LastNpmVers%') do (set NpmVers=%%V)
 set PathExist=1
 set PathCheck="echo ";%PATH%;" | find /c /i ";%CurFolder%App;" "
 
-:::::: Network
+:::::: NETWORK
 
 %CURL% -is www.google.com | %GREP% -q "200 OK"
 
@@ -97,8 +97,7 @@ if exist "App\node_modules" (
   mkdir "App\node_modules"
 )
 
-%ZCAT% "tmp\npm-%NpmVers%.tgz" | %TAR% -C "tmp" -x
-rename "tmp\package" "npm"
+%ZCAT% "tmp\npm-%NpmVers%.tgz" | %TAR% -C "tmp" -xm
 
 robocopy /s tmp\npm App\node_modules\npm
 robocopy /s App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd
@@ -117,6 +116,7 @@ echo init-module = %CurFolder%etc\.npm-init.js >> "App\etc\npmrc"
 echo userconfig = %CurFolder%etc\npmrc >> "App\etc\npmrc"
 
 ::::::::::::::::::::
+
 :::::: PATH
 
 for /f %%P in ('%PathCheck%') do set FindPath=%%P
