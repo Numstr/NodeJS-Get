@@ -91,8 +91,8 @@ if exist "App\node_modules" (
 
 %ZCAT% "tmp\npm-%NpmVers%.tgz" | %TAR% -C "tmp" -xm
 
-robocopy /S tmp\npm App\node_modules\npm
-robocopy /S App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd
+robocopy /move /S tmp\package App\node_modules\npm /NFL /NDL /NJH /NJS
+robocopy /S App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd /NFL /NDL /NJH /NJS
 
 rmdir "tmp" /s /q
 

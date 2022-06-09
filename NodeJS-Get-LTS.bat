@@ -89,7 +89,7 @@ if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
 echo   Get Latest NPM
-%CURL% -#k https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -o "tmp\npm-%NpmVers%.tgz"
+%CURL% -# -k https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -o "tmp\npm-%NpmVers%.tgz"
 
 if exist "App\node_modules" (
   rmdir "App\node_modules\npm" /s /q
@@ -99,8 +99,8 @@ if exist "App\node_modules" (
 
 %ZCAT% "tmp\npm-%NpmVers%.tgz" | %TAR% -C "tmp" -xm
 
-robocopy /s tmp\npm App\node_modules\npm
-robocopy /s App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd
+robocopy /move /s tmp\package App\node_modules\npm /NFL /NDL /NJH /NJS
+robocopy /s App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd /NFL /NDL /NJH /NJS
 
 rmdir "tmp" /s /q
 
