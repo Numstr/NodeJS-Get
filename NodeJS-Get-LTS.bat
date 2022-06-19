@@ -5,10 +5,10 @@ cd /d %~dp0
 
 set CurFolder=%~dp0
 
-set CURL="%CurFolder%\Utils\curl.exe"
-set GREP="%CurFolder%\Utils\grep.exe"
-set TAR="%CurFolder%\Utils\tar.exe"
-set ZCAT="%CurFolder%\Utils\zcat.exe"
+set CURL="%CurFolder%Utils\curl.exe"
+set GREP="%CurFolder%Utils\grep.exe"
+set TAR="%CurFolder%Utils\tar.exe"
+set ZCAT="%CurFolder%Utils\zcat.exe"
 
 set NodeVers=
 set "LastNodeVers=%CURL% -s -k -r 15-16 https://nodejs.org/download/release/index.json"
