@@ -5,10 +5,8 @@ cd /d %~dp0
 
 set CurFolder=%~dp0
 
+set BUSYBOX="%CurFolder%Utils\busybox.exe"
 set CURL="%CurFolder%Utils\curl.exe"
-set GREP="%CurFolder%Utils\grep.exe"
-set TAR="%CurFolder%Utils\tar.exe"
-set ZCAT="%CurFolder%Utils\zcat.exe"
 
 set NodeVers=
 set "LastNodeVers=%CURL% -s -k -r 15-16 https://nodejs.org/download/release/index.json"
@@ -25,7 +23,7 @@ set PathCheck="echo ";%PATH%;" | find /c /i ";%CurFolder%App;" "
 
 :::::: NETWORK
 
-%CURL% -is www.google.com | %GREP% -q "200 OK"
+%CURL% -is www.google.com | %BUSYBOX% grep -q "200 OK"
 
 if "%ERRORLEVEL%" == "1" (
   echo Check Your Network Connection
@@ -48,9 +46,9 @@ if not exist "App/node.exe" (
 :N0
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-  set LastNodeHash64="%CURL% -s -k https://nodejs.org/download/release/latest/SHASUMS256.txt | %GREP% "win-x64/node.exe" "
+  set LastNodeHash64="%CURL% -s -k https://nodejs.org/download/release/latest/SHASUMS256.txt | %BUSYBOX% grep "win-x64/node.exe" "
 ) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-  set LastNodeHash86="%CURL% -s -k https://nodejs.org/download/release/latest/SHASUMS256.txt | %GREP% "win-x86/node.exe" "
+  set LastNodeHash86="%CURL% -s -k https://nodejs.org/download/release/latest/SHASUMS256.txt | %BUSYBOX% grep "win-x86/node.exe" "
 ) else exit
 
 for /f %%H in ('%CurNodeHash%') do Set CurHash=%%H
@@ -89,7 +87,7 @@ if exist "App\node_modules" (
   mkdir "App\node_modules"
 )
 
-%ZCAT% "tmp\npm-%NpmVers%.tgz" | %TAR% -C "tmp" -xm
+%BUSYBOX% zcat "tmp\npm-%NpmVers%.tgz" | %BUSYBOX% tar -C "tmp" -xm
 
 robocopy /move /S tmp\package App\node_modules\npm /NFL /NDL /NJH /NJS
 robocopy /S App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd /NFL /NDL /NJH /NJS
@@ -125,3 +123,5 @@ reg.exe add "%Key%" /v Path /t REG_EXPAND_SZ /d "%CurPath%;%CurFolder%App" /f
 setx temp "%temp%"
 
 ::::::::::::::::::::
+
+pause
