@@ -132,4 +132,5 @@ setx temp "%temp%"
 
 ::::::::::::::::::::
 
+echo Done
 pause

@@ -8,10 +8,6 @@ set CurFolder=%~dp0
 set BUSYBOX="%CurFolder%Utils\busybox.exe"
 set CURL="%CurFolder%Utils\curl.exe"
 
-set NodeVers=
-set "LastNodeVers=%CURL% -s -k -r 15-16 https://nodejs.org/download/release/index.json"
-for /f %%V in ('%LastNodeVers%') do (set NodeVers=%%V)
-
 set CurNodeHash="certUtil -hashfile %CurFolder%App\node.exe SHA256 | findstr ^[0-9a-f]$"
 
 set NpmVers=
@@ -89,8 +85,8 @@ if exist "App\node_modules" (
 
 %BUSYBOX% zcat "tmp\npm-%NpmVers%.tgz" | %BUSYBOX% tar -C "tmp" -xm
 
-robocopy /move /S tmp\package App\node_modules\npm /NFL /NDL /NJH /NJS
-robocopy /S App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd /NFL /NDL /NJH /NJS
+robocopy /move /s tmp\package App\node_modules\npm /NFL /NDL /NJH /NJS
+robocopy /s App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd /NFL /NDL /NJH /NJS
 
 rmdir "tmp" /s /q
 
@@ -124,4 +120,5 @@ setx temp "%temp%"
 
 ::::::::::::::::::::
 
+echo Done
 pause
