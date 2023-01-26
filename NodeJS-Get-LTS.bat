@@ -15,7 +15,7 @@ for /f %%V in ('%LastNodeVers%') do (set NodeVers=%%V)
 set CurNodeHash="certUtil -hashfile %CurFolder%App\node.exe SHA256 | findstr ^[0-9a-f]$"
 
 set NpmVers=
-set "LastNpmVers=%CURL% -s -k -r 145-150 https://registry.npmjs.org/npm"
+set "LastNpmVers=%CURL% -s -k -r 145-149 https://registry.npmjs.org/npm"
 for /f %%V in ('%LastNpmVers%') do (set NpmVers=%%V)
 
 set PathExist=1
