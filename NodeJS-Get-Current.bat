@@ -6,7 +6,6 @@ set HERE=%~dp0
 set HERE_DS=%HERE:\=\\%
 
 set BUSYBOX="%HERE%Utils\busybox.exe"
-set CURL="%HERE%Utils\curl.exe"
 
 set CurNodeHash="certUtil -hashfile %HERE%App\node.exe SHA256 | findstr ^[0-9a-f]$"
 
@@ -35,9 +34,9 @@ if not exist "App/node.exe" (
 :N0
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-  set LastNodeHash64="%CURL% -s -k https://nodejs.org/download/release/latest/SHASUMS256.txt | %BUSYBOX% grep "win-x64/node.exe" "
+  set LastNodeHash64="%BUSYBOX% wget -q -O- https://nodejs.org/download/release/latest/SHASUMS256.txt | %BUSYBOX% grep "win-x64/node.exe" "
 ) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-  set LastNodeHash86="%CURL% -s -k https://nodejs.org/download/release/latest/SHASUMS256.txt | %BUSYBOX% grep "win-x86/node.exe" "
+  set LastNodeHash86="%BUSYBOX% wget -q -O- https://nodejs.org/download/release/latest/SHASUMS256.txt | %BUSYBOX% grep "win-x86/node.exe" "
 ) else exit
 
 for /f %%H in ('%CurNodeHash%') do Set CurHash=%%H
@@ -52,10 +51,10 @@ if %CurHash% == %LastHash% (
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
   echo   Get Latest NodeJS Current x64
-  %CURL% -# -k https://nodejs.org/download/release/latest/win-x64/node.exe -o "App\node.exe"
+  %BUSYBOX% wget https://nodejs.org/download/release/latest/win-x64/node.exe -O "App\node.exe"
 ) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
   echo   Get Latest NodeJS Current x86
-  %CURL% -# -k https://nodejs.org/download/release/latest-v17.x/win-x86/node.exe -o "App\node.exe"
+  %BUSYBOX% wget https://nodejs.org/download/release/latest-v17.x/win-x86/node.exe -O "App\node.exe"
 ) else exit
 
 ::::::::::::::::::::
@@ -66,22 +65,29 @@ if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
 
 set NPM_URL="https://github.com/npm/cli/releases/latest"
 
-%BUSYBOX% wget -q -O - %NPM_URL% | %BUSYBOX% grep -o tag/v[0-9.]\+[0-9] | %BUSYBOX% cut -d "v" -f2 > latest.txt
-for /f %%V in ('more latest.txt') do (set NpmVers=%%V)
+%BUSYBOX% wget -q -O- %NPM_URL% | %BUSYBOX% grep -o tag/v[0-9.]\+[0-9] | %BUSYBOX% cut -d "v" -f2 > latestNPM.txt
+for /f %%V in ('more latestNPM.txt') do (set NpmVers=%%V)
 
-if exist "latest.txt" del "latest.txt" > NUL
+if exist "latestNPM.txt" del "latestNPM.txt" > NUL
 
 if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
 echo   Get Latest NPM
-%CURL% -# -k https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -o "tmp\npm-%NpmVers%.tgz"
+%BUSYBOX% wget https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -O "tmp\npm-%NpmVers%.tgz"
 
 if exist "App\node_modules" (
-  rmdir "App\node_modules\npm" /s /q
+  rmdir "App\node_modules\npm" /s /q 2> NUL
 ) else (
   mkdir "App\node_modules"
 )
+
+::::::::::::::::::::
+
+:::::: UNPACKING
+
+echo:
+echo Unpacking
 
 %BUSYBOX% zcat "tmp\npm-%NpmVers%.tgz" | %BUSYBOX% tar -C "tmp" -xm
 
