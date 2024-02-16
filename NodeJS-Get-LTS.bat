@@ -14,9 +14,9 @@ for /f %%V in ('%LastNodeVers%') do (set NodeVers=%%V)
 
 set CurNodeHash="certUtil -hashfile %HERE%App\node.exe SHA256 | findstr ^[0-9a-f]$"
 
-:::::: NETWORK
+:::::: NETWORK CHECK
 
-%CURL% -is www.google.com | %BUSYBOX% grep -q "200 OK"
+%BUSYBOX% wget -q --user-agent="Mozilla" --spider https://google.com
 
 if "%ERRORLEVEL%" == "1" (
   echo Check Your Network Connection
