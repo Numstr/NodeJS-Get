@@ -50,10 +50,14 @@ if %CurHash% == %LastHash% (
 :N1
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-  echo   Get Latest NodeJS Current x64
+  echo:
+  echo Get Latest NodeJS Current x64
+  echo:
   %BUSYBOX% wget https://nodejs.org/download/release/latest/win-x64/node.exe -O "App\node.exe"
 ) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-  echo   Get Latest NodeJS Current x86
+  echo:
+  echo Get Latest NodeJS Current x86
+  echo:
   %BUSYBOX% wget https://nodejs.org/download/release/latest-v17.x/win-x86/node.exe -O "App\node.exe"
 ) else exit
 
@@ -73,7 +77,9 @@ if exist "latestNPM.txt" del "latestNPM.txt" > NUL
 if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
-echo   Get Latest NPM
+echo:
+echo Get Latest NPM
+echo:
 %BUSYBOX% wget https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -O "tmp\npm-%NpmVers%.tgz"
 
 if exist "App\node_modules" (
