@@ -1,25 +1,18 @@
 @echo off
-SetLocal EnableExtensions EnableDelayedExpansion
 
 cd /d %~dp0
 
-set CurFolder=%~dp0
+set HERE=%~dp0
+set HERE_DS=%HERE:\=\\%
 
-set BUSYBOX="%CurFolder%Utils\busybox.exe"
-set CURL="%CurFolder%Utils\curl.exe"
+set BUSYBOX="%HERE%Utils\busybox.exe"
+set CURL="%HERE%Utils\curl.exe"
 
 set NodeVers=
 set "LastNodeVers=%CURL% -s -k -r 15-16 https://nodejs.org/download/release/index.json"
 for /f %%V in ('%LastNodeVers%') do (set NodeVers=%%V)
 
-set CurNodeHash="certUtil -hashfile %CurFolder%App\node.exe SHA256 | findstr ^[0-9a-f]$"
-
-set NpmVers=
-set "LastNpmVers=%CURL% -s -k -r 145-149 https://registry.npmjs.org/npm"
-for /f %%V in ('%LastNpmVers%') do (set NpmVers=%%V)
-
-set PathExist=1
-set PathCheck="echo ";%PATH%;" | find /c /i ";%CurFolder%App;" "
+set CurNodeHash="certUtil -hashfile %HERE%App\node.exe SHA256 | findstr ^[0-9a-f]$"
 
 :::::: NETWORK
 
@@ -83,6 +76,13 @@ if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
 
 :NPM
 
+set NPM_URL="https://github.com/npm/cli/releases/latest"
+
+%BUSYBOX% wget -q -O - %NPM_URL% | %BUSYBOX% grep -o tag/v[0-9.]\+[0-9] | %BUSYBOX% cut -d "v" -f2 > latest.txt
+for /f %%V in ('more latest.txt') do (set NpmVers=%%V)
+
+if exist "latest.txt" del "latest.txt" > NUL
+
 if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
@@ -107,15 +107,18 @@ rmdir "tmp" /s /q
 :::::: NPMRC
 
 if not exist "App\etc" mkdir "App\etc"
-echo cache = %CurFolder%Cache > "App\etc\npmrc"
-echo globalconfig = %CurFolder%etc\npmrc >> "App\etc\npmrc"
-echo globalignorefile = %CurFolder%etc\.npmignore >> "App\etc\npmrc"
-echo init-module = %CurFolder%etc\.npm-init.js >> "App\etc\npmrc"
-echo userconfig = %CurFolder%etc\npmrc >> "App\etc\npmrc"
+echo cache = %HERE%Cache > "App\etc\npmrc"
+echo globalconfig = %HERE%etc\npmrc >> "App\etc\npmrc"
+echo globalignorefile = %HERE%etc\.npmignore >> "App\etc\npmrc"
+echo init-module = %HERE%etc\.npm-init.js >> "App\etc\npmrc"
+echo userconfig = %HERE%etc\npmrc >> "App\etc\npmrc"
 
 ::::::::::::::::::::
 
 :::::: PATH
+
+set PathExist=1
+set PathCheck="echo ";%PATH%;" | find /c /i ";%HERE%App;" "
 
 for /f %%P in ('%PathCheck%') do set FindPath=%%P
 
@@ -126,7 +129,7 @@ if %PathExist% == %FindPath% (
 set Key=HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
 
 for /f "tokens=2*" %%a in ('reg.exe query "%Key%" /v Path^|Find "Path"') do set CurPath=%%~b
-reg.exe add "%Key%" /v Path /t REG_EXPAND_SZ /d "%CurPath%;%CurFolder%App" /f
+reg.exe add "%Key%" /v Path /t REG_EXPAND_SZ /d "%CurPath%;%HERE%App" /f
 
 setx temp "%temp%"
 
