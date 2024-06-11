@@ -63,7 +63,7 @@ if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
   echo:
   echo Get Latest NodeJS LTS x86
   echo:
-  %BUSYBOX% wget https://nodejs.org/download/release/latest-v%NodeLTS%.x/win-x86/node.exe -O "App\node.exe"
+  %BUSYBOX% wget https://nodejs.org/dist/v%NodeLTS%/win-x86/node.exe -O "App\node.exe"
 ) else exit
 
 ::::::::::::::::::::
