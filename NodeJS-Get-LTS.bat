@@ -116,7 +116,7 @@ echo cache = %HERE%Cache > "App\etc\npmrc"
 echo globalconfig = %HERE%etc\npmrc >> "App\etc\npmrc"
 echo globalignorefile = %HERE%etc\.npmignore >> "App\etc\npmrc"
 echo init-module = %HERE%etc\.npm-init.js >> "App\etc\npmrc"
-echo userconfig = %HERE%etc\npmrc >> "App\etc\npmrc"
+echo userconfig = %HERE%etc\.npmrc >> "App\etc\npmrc"
 
 ::::::::::::::::::::
 
