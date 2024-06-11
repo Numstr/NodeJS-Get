@@ -27,7 +27,7 @@ if not exist "App" (
   mkdir "App"
 )
 
-%BUSYBOX% wget -q -O- https://nodejs.org | %BUSYBOX% grep -o [0-9.]\+[0-9]\+" "LTS | %BUSYBOX% cut -d "LTS" -f1 > latestNODE.txt
+%BUSYBOX% wget -q -O- https://nodejs.org | %BUSYBOX% grep -o "<b>"v\+[0-9.]\+[0-9] | %BUSYBOX% cut -d "v" -f2 > latestNODE.txt
 for /f %%V in ('more latestNODE.txt') do (set NodeLTS=%%V)
 
 if exist "latestNODE.txt" del "latestNODE.txt" > NUL
