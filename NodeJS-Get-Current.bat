@@ -78,7 +78,7 @@ if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
 echo:
-echo Get Latest NPM
+echo Get Latest NPM 'v%NpmVers%'
 echo:
 %BUSYBOX% wget https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -O "tmp\npm-%NpmVers%.tgz"
 

@@ -56,12 +56,12 @@ if %CurHash% == %LastHash% (
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
   echo:
-  echo Get Latest NodeJS LTS x64
+  echo Get Latest NodeJS LTS x64 'v%NodeLTS%'
   echo:
   %BUSYBOX% wget https://nodejs.org/dist/v%NodeLTS%/win-x64/node.exe -O "App\node.exe"
 ) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
   echo:
-  echo Get Latest NodeJS LTS x86
+  echo Get Latest NodeJS LTS x86 'v%NodeLTS%'
   echo:
   %BUSYBOX% wget https://nodejs.org/dist/v%NodeLTS%/win-x86/node.exe -O "App\node.exe"
 ) else exit
@@ -83,7 +83,7 @@ if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
 echo:
-echo Get Latest NPM
+echo Get Latest NPM 'v%NpmVers%'
 echo:
 %BUSYBOX% wget https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -O "tmp\npm-%NpmVers%.tgz"
 
