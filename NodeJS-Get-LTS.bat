@@ -6,8 +6,7 @@ set HERE=%~dp0
 set HERE_DS=%HERE:\=\\%
 
 set BUSYBOX="%HERE%Utils\busybox.exe"
-
-set CurNodeHash="certUtil -hashfile %HERE%App\node.exe SHA256 | findstr ^[0-9a-f]$"
+set SZIP="%HERE%Utils\7za.exe"
 
 :::::: NETWORK CHECK
 
@@ -21,77 +20,59 @@ if "%ERRORLEVEL%" == "1" (
 
 ::::::::::::::::::::
 
-:::::: NODE
+:::::: ARCH
 
-if not exist "App" (
-  mkdir "App"
-)
-
-%BUSYBOX% wget -q -O- https://nodejs.org | %BUSYBOX% grep -o "<b>"v\+[0-9.]\+[0-9] | %BUSYBOX% cut -d "v" -f2 > latestNODE.txt
-for /f %%V in ('more latestNODE.txt') do (set NodeLTS=%%V)
-
-if exist "latestNODE.txt" del "latestNODE.txt" > NUL
-
-if not exist "App/node.exe" (
-  GOTO N1
-) else GOTO N0
-
-:N0
-
-if "%PROCESSOR_ARCHITECTURE%" == "AMD64" ( 
-  set LastNodeHash64="%BUSYBOX% wget -q -O- https://nodejs.org/dist/v%NodeLTS%/SHASUMS256.txt | %BUSYBOX% grep "win-x64/node.exe" "
-) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-  set LastNodeHash86="%BUSYBOX% wget -q -O- https://nodejs.org/dist/v%NodeLTS%/SHASUMS256.txt | %BUSYBOX% grep "win-x86/node.exe" "
+if "%PROCESSOR_ARCHITECTURE%" == "x86" (
+  set ARCH=x86
+) else if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+  set ARCH=x64
 ) else exit
 
-for /f %%H in ('%CurNodeHash%') do Set CurHash=%%H
-for /f %%H in ('%LastNodeHash64%') do Set LastHash=%%H
-for /f %%H in ('%LastNodeHash86%') do Set LastHash=%%H
-
-if %CurHash% == %LastHash% (
-  GOTO NPM
-) else GOTO N1
-
-:N1
-
-if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-  echo:
-  echo Get Latest NodeJS LTS x64 'v%NodeLTS%'
-  echo:
-  %BUSYBOX% wget https://nodejs.org/dist/v%NodeLTS%/win-x64/node.exe -O "App\node.exe"
-) else if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-  echo:
-  echo Get Latest NodeJS LTS x86 'v%NodeLTS%'
-  echo:
-  %BUSYBOX% wget https://nodejs.org/dist/v%NodeLTS%/win-x86/node.exe -O "App\node.exe"
-) else exit
+:: set ARCH=x86
+:: set ARCH=x64
 
 ::::::::::::::::::::
 
-:::::: NPM
+:::::: VERSION CHECK
 
-:NPM
+set APP_EXE=App\node.exe
+if not exist %APP_EXE% goto LATEST
 
-set NPM_URL="https://github.com/npm/cli/releases/latest"
+for /f %%V in ('powershell -NoProfile -Command ^
+  "(Get-Item %APP_EXE%).VersionInfo.FileVersion"') do (
+    set CURRENT=%%V
+)
+echo Current: %CURRENT%
 
-%BUSYBOX% wget -q -O - %NPM_URL% | %BUSYBOX% grep -o tag/v[0-9.]\+[0-9] | %BUSYBOX% cut -d "v" -f2 > latestNPM.txt
-for /f %%V in ('more latestNPM.txt') do (set NpmVers=%%V)
+:LATEST
 
-if exist "latestNPM.txt" del "latestNPM.txt" > NUL
+set LATEST_URL="https://nodejs.org"
+
+%BUSYBOX% wget -q -O- %LATEST_URL% | %BUSYBOX% grep -o ">v"\+[0-9.]\+[0-9] | %BUSYBOX% head -1 | %BUSYBOX% cut -d "v" -f2 > latest.txt
+for /f %%V in ('more latest.txt') do (set LATEST=%%V)
+
+if exist "latest.txt" del "latest.txt" > NUL
+echo Latest: %LATEST%
+echo:
+
+if "%CURRENT%" == "%LATEST%" (
+  echo You Have The Latest Version
+  pause
+  exit
+) else goto GET
+
+::::::::::::::::::::
+
+:GET
+
+:::::: GET LATEST VERSION
+
+set NodeLTS="https://nodejs.org/dist/v%LATEST%/node-v%LATEST%-win-%ARCH%.zip"
 
 if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
-echo:
-echo Get Latest NPM 'v%NpmVers%'
-echo:
-%BUSYBOX% wget https://registry.npmjs.org/npm/-/npm-%NpmVers%.tgz -O "tmp\npm-%NpmVers%.tgz"
-
-if exist "App\node_modules" (
-  rmdir "App\node_modules\npm" /s /q 2> NUL
-) else (
-  mkdir "App\node_modules"
-)
+%BUSYBOX% wget %NodeLTS% -O TMP\node-%LATEST%-%ARCH%.zip
 
 ::::::::::::::::::::
 
@@ -100,10 +81,9 @@ if exist "App\node_modules" (
 echo:
 echo Unpacking
 
-%BUSYBOX% zcat "tmp\npm-%NpmVers%.tgz" | %BUSYBOX% tar -C "tmp" -xm
+%SZIP% x -aoa tmp\node-%LATEST%-%ARCH%.zip -o"tmp\" > NUL
 
-robocopy /move /s tmp\package App\node_modules\npm /NFL /NDL /NJH /NJS
-robocopy /s App\node_modules\npm\bin App\ npm npm.cmd npx npx.cmd /NFL /NDL /NJH /NJS
+robocopy /move /s tmp\node-v%LATEST%-win-%ARCH% App\ /NFL /NDL /NJH /NJS
 
 rmdir "tmp" /s /q
 
