@@ -73,7 +73,7 @@ set NodeLTS="https://nodejs.org/dist/v%LATEST%/node-v%LATEST%-win-%ARCH%.zip"
 if exist "tmp" rmdir "tmp" /s /q
 mkdir "tmp"
 
-%BUSYBOX% wget %NodeLTS% -O TMP\node-%LATEST%-%ARCH%.zip
+%BUSYBOX% wget %NodeLTS% -O tmp\node-%LATEST%-%ARCH%.zip
 
 ::::::::::::::::::::
 
