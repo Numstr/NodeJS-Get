@@ -5,7 +5,7 @@ cd /d %~dp0
 set HERE=%~dp0
 set HERE_DS=%HERE:\=\\%
 
-set BUSYBOX="%HERE%Utils\busybox.exe"
+set BUSYBOX=%HERE%Utils\busybox.exe
 set SZIP="%HERE%Utils\7za.exe"
 
 :::::: NETWORK CHECK
@@ -48,10 +48,11 @@ echo Current: %CURRENT%
 
 set LATEST_URL="https://nodejs.org"
 
-%BUSYBOX% wget -q -O- %LATEST_URL% | %BUSYBOX% grep -o ">v"\+[0-9.]\+[0-9] | %BUSYBOX% head -1 | %BUSYBOX% cut -d "v" -f2 > latest.txt
-for /f %%V in ('more latest.txt') do (set LATEST=%%V)
-
-if exist "latest.txt" del "latest.txt" > NUL
+for /f %%V in ('%BUSYBOX% wget -q -O- %LATEST_URL%
+  ^| %BUSYBOX% grep -o ">v[0-9.]\+[0-9]"
+  ^| %BUSYBOX% head -1
+  ^| %BUSYBOX% cut -d "v" -f2') ^
+do (set LATEST=%%V)
 echo Latest: %LATEST%
 echo:
 
