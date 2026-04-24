@@ -10,7 +10,7 @@ set SZIP="%HERE%Utils\7za.exe"
 
 :::::: NETWORK CHECK
 
-%BUSYBOX% wget -q --user-agent="Mozilla" --spider https://google.com
+%BUSYBOX% wget -q --user-agent="Mozilla" --spider https://nodejs.org
 
 if "%ERRORLEVEL%" == "1" (
   echo Check Your Network Connection
